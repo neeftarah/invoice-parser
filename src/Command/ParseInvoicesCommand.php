@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Service\InvoiceParser;
+use App\Repository\InvoiceRepository;
+use App\Service\InvoiceParserService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:parse')]
+#[AsCommand(
+    name: 'app:parse',
+    description: 'Parse les fichiers de factures et met à jour la base de données',
+)]
 class ParseInvoicesCommand extends Command
 {
-    private InvoiceParser $parser;
-
-    public function __construct(InvoiceParser $parser)
-    {
+    public function __construct(
+        private readonly InvoiceParserService $parser,
+        private readonly InvoiceRepository $invoiceRepository
+    ) {
         parent::__construct();
-        $this->parser = $parser;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -28,20 +31,22 @@ class ParseInvoicesCommand extends Command
 
         $io->info('Parsing JSON invoices...');
         try {
-            $this->parser->parse('data/invoices.json');
+            $invoicesData = $this->parser->parse('data/invoices.json');
+            $this->invoiceRepository->saveAll($invoicesData);
             $io->success('JSON invoices successfully processed!');
         } catch (\Exception $e) {
-            $io->error('Error parsing JSON invoices: '.$e->getMessage());
+            $io->error('Error parsing JSON invoices: ' . $e->getMessage());
 
             return Command::FAILURE;
         }
 
         $io->info('Parsing CSV invoices...');
         try {
-            $this->parser->parse('data/invoices.csv');
+            $invoicesData = $this->parser->parse('data/invoices.csv');
+            $this->invoiceRepository->saveAll($invoicesData);
             $io->success('CSV invoices successfully processed!');
         } catch (\Exception $e) {
-            $io->error('Error parsing CSV invoices: '.$e->getMessage());
+            $io->error('Error parsing CSV invoices: ' . $e->getMessage());
 
             return Command::FAILURE;
         }

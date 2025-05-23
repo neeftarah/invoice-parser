@@ -14,4 +14,27 @@ class InvoiceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Invoice::class);
     }
+
+    /**
+     * Sauvegarde les factures dans la base de données.
+     *
+     * @param array $invoicesData Tableau de factures à sauvegarder.
+     * @return void
+     */
+    public function saveAll(array $invoicesData): void
+    {
+        $em = $this->getEntityManager();
+
+        foreach ($invoicesData as $data) {
+            $invoice = $this->findOneBy(['name' => $data['nom']]) ?? new Invoice();
+            $invoice->setAmount((float) $data['montant']);
+            $invoice->setCurrency($data['devise']);
+            $invoice->setName($data['nom']);
+            $invoice->setDate(new \DateTime($data['date']));
+
+            $em->persist($invoice);
+        }
+
+        $em->flush();
+    }
 }

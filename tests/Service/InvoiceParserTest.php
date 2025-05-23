@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests;
+namespace App\Tests\Service;
 
-use App\Service\InvoiceParser;
+use App\Service\InvoiceParserService;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
+/**
+ * Vérification du bon fonctionnement du parser de factures
+ */
 class InvoiceParserTest extends KernelTestCase
 {
     private $entityManager;
@@ -20,9 +23,10 @@ class InvoiceParserTest extends KernelTestCase
         $connection = $this->createMock(Connection::class);
         $this->entityManager->method('getConnection')->willReturn($connection);
 
-        $connection->expects($this->exactly(10))->method('executeStatement');
+        $connection->expects($this->exactly(10))
+                   ->method('executeStatement');
 
-        $invoiceParser = new InvoiceParser($this->entityManager);
+        $invoiceParser = new InvoiceParserService($this->entityManager);
 
         $invoiceParser->parse('data/invoices.json');
     }
@@ -36,10 +40,8 @@ class InvoiceParserTest extends KernelTestCase
 
         $connection->expects($this->exactly(10))->method('executeStatement');
 
-        $invoiceParser = new InvoiceParser($this->entityManager);
+        $invoiceParser = new InvoiceParserService($this->entityManager);
 
         $invoiceParser->parse('data/invoices.csv');
     }
-
 }
-

@@ -21,7 +21,7 @@ final class Version20250523121810 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE invoice ADD date DATE NOT NULL
+            ALTER TABLE invoice ADD date DATE NOT NULL DEFAULT CURRENT_DATE
         SQL);
     }
 
