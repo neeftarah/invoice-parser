@@ -73,6 +73,7 @@
         "friendsofphp/php-cs-fixer": "^3.75",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^9",
-        "squizlabs/php_codesniffer": "*"
+        "squizlabs/php_codesniffer": "*",
+        "symfony/maker-bundle": "^1.63"
     }
 }
