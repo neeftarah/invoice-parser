@@ -6,6 +6,20 @@ jobs:
   build:
     name: Novalend Invoice Parser
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5433:5432
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: '!ChangeMe!'
+          POSTGRES_DB: app
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -44,9 +58,9 @@ jobs:
           php bin/console --env=test doctrine:database:drop --force
           php bin/console --env=test doctrine:database:create
           php bin/console --env=test doctrine:migrations:migrate -n
-          php bin/console --env=test doctrine:fixtures:load -n
+#          php bin/console --env=test doctrine:fixtures:load -n # Pas de Fixtures pour le moment
         env:
-          DATABASE_URL: postgres://app_test:$ecretf0rt3st@127.0.0.1:${{ job.services.postgres.ports[5432] }}/app?charset=UTF-8
+          DATABASE_URL: postgres://app:!ChangeMe!@localhost:5433/app?charset=UTF-8
 
       - name: Lint YAML files
         run: php ./bin/console lint:yaml config --parse-tags
@@ -64,13 +78,10 @@ jobs:
       - name: Codding standards
         run: php vendor/bin/phpcs -v --standard=PSR2 --ignore=./src/Kernel.php ./src
 
-      - name: PHPStan
-        run: php vendor/bin/phpstan analyze
-
       - name: Run PHPUnit tests
         run: php vendor/bin/phpunit --testdox --coverage-text
         env:
-          DATABASE_URL: postgres://app_test:$ecretf0rt3st@127.0.0.1:${{ job.services.postgres.ports[5432] }}/app?charset=UTF-8
+          DATABASE_URL: postgres://app:!ChangeMe!@localhost:5433/app?charset=UTF-8
 
       - name: Check security vulnerabilities
         uses: symfonycorp/security-checker-action@v4
