@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\InvoiceRepository')]
 class Invoice
 {
-    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: Types::INTEGER)]
     private int $id;
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column(type: Types::STRING)]
     private string $name;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: Types::FLOAT)]
     private float $amount;
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column(type: Types::STRING)]
     private string $currency;
 
-    #[ORM\Column(type: 'date')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected \DateTime $date;
 
     public function getId(): int
